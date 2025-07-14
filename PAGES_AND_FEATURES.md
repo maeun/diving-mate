@@ -2,6 +2,10 @@
 
 ---
 
+> **[업데이트 안내]**
+>
+> `/instructor` 및 `/resort` 관련 페이지는 개별 상세 페이지(`instructor/[id]`, `resort/[id]`)로 구현되어 있으며, 본 문서에서는 해당 페이지의 기능 개발, API 연동, UI/UX 통일 및 고도화, 페이지 간 연계 등 모든 변경 및 확장 사항을 지속적으로 관리합니다. 각 페이지별 상세 명세, UI/UX 정책, 데이터 모델, API, 상태 관리 등은 아래 각 섹션에서 최신 상태로 유지됩니다. (최종 반영일: 최신)
+
 ## 📋 목차
 
 1. [페이지 구조](#페이지-구조)
@@ -21,14 +25,14 @@
 
 ```
 /                           # 메인 페이지
-/search                      # 검색 결과 페이지
-/instructor/[id]            # 강사 프로필 상세
-/resort/[id]                # 리조트 프로필 상세
-/auth/login                 # 로그인 페이지
-/auth/register              # 회원가입 페이지
-/about                      # 서비스 소개
-/terms                      # 이용약관
-/privacy                    # 개인정보처리방침
+/search                    # 검색 결과 페이지 (구현됨)
+/instructor/[id]           # 강사 프로필 상세 (구현됨)
+/resort/[id]               # 리조트 프로필 상세
+/auth/login                # 로그인 페이지
+/auth/register             # 회원가입 페이지
+/about                     # 서비스 소개
+/terms                     # 이용약관
+/privacy                   # 개인정보처리방침
 ```
 
 ### 2. 인증 필요 페이지
@@ -132,6 +136,28 @@ interface MainPage {
 - **신규 등록**: 최근 7일 내 등록된 강사/리조트
 - **통계/소개 섹션 제거**: 메인에서 통계/소개(강사/리조트/이용자 수 등) 섹션은 더 이상 노출하지 않음
 - **후기 하이라이트**: 사용자 후기 캐러셀(3개 카드(데스크탑)/1개 카드(모바일), 가운데 카드 강조, 양쪽 흐림, 무한 슬라이드, 인디케이터/화살표 없음, 그림자 자연스러움, 카드가 바닥에 닿지 않음, Tailwind 반응형 기준 적용)
+
+---
+
+### 2. 검색 결과 페이지 (`/search`)
+
+- 검색 쿼리 및 결과 요약(강사/리조트 수)
+- 강사/리조트 결과를 section별로 구분하여 표시
+- InstructorCard, ResortCard를 활용한 반응형 그리드
+- 필터 패널(placeholder, 추후 확장)
+- shadcn/ui, Tailwind CSS 스타일 적용
+- 모바일-퍼스트, 반응형 레이아웃
+- 현재 mock data 기반, API 연동 및 고도화 준비
+
+### 3. 강사 프로필 상세 페이지 (`/instructor/[id]`)
+
+- 강사 아바타, 이름, 자격증, 경력, 위치, 평점, 후기 수, 전문분야, 가격, 소개
+- 인스타그램 링크(등록 시 노출, SNS 연동 확장 가능)
+- 포트폴리오/갤러리(placeholder)
+- 후기/평점(placeholder)
+- 문의/찜하기 CTA 버튼
+- 반응형, shadcn/ui + Tailwind CSS 스타일
+- 현재 mock data 기반, API 연동 및 고도화 준비
 
 ---
 
@@ -316,6 +342,7 @@ interface InstructorProfileData {
     avatar: string;
     location: string;
     description: string;
+    instagram?: string; // SNS 연동 필드 추가
   };
   certification: {
     level: string;
@@ -533,6 +560,7 @@ interface Review {
 /instructors/{instructorId}
   - userId: string
   - basic: InstructorBasic
+    - instagram?: string // SNS 연동 필드
   - certification: Certification
   - experience: Experience
   - services: Service[]
@@ -617,7 +645,7 @@ GET /api/search/popular
 ### 프로필 API
 
 ```
-GET /api/instructors/{id}
+GET /api/instructors/{id}   # 강사 상세 조회 (SNS 포함)
 POST /api/instructors
 PUT /api/instructors/{id}
 GET /api/resorts/{id}
